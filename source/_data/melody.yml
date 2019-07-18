@@ -46,7 +46,7 @@ highlight_theme: default
 # 自动换行代码
 code_word_wrap: true 
 highlight:
-    line_number: false
+    line_number: true
 # Nav settings
 # ---------------
 #social:
@@ -183,11 +183,11 @@ QR_code:
 # Share System
 # ---------------
 addThis:
-  enable: true
+  enable: false
   pubid: ra-5c6fb3ab08de53a5
 
-# sharejs:
-  # enable: false
+sharejs:
+  enable: true
   # disabled_sites: 
   
 
