@@ -240,8 +240,9 @@ since: 2018
 # footer_custom_text:
 
 ICP:
-  enable: false
-  #text: 
+  enable: true
+  text: 浙ICP备16002000号-3
+  url: http://icp.chinaz.com/info?q=yangzhenyu.com.cn
 
 # busuanzi count for PV / UV in site
 busuanzi:
