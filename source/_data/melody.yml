@@ -242,7 +242,7 @@ since: 2018
 ICP:
   enable: true
   text: 浙ICP备16002000号-3
-  url: http://icp.chinaz.com/info?q=yangzhenyu.com.cn
+  url: https://beian.miit.gov.cn
 
 # busuanzi count for PV / UV in site
 busuanzi:
