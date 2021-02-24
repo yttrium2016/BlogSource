@@ -1,5 +1,5 @@
 ---
-title: v2ay Cloudflare CDN 加速访问 科学
+title: v2ray Cloudflare CDN 加速访问 科学
 tags:
   - 梯子
   - vps
@@ -10,7 +10,7 @@ abbrlink: 61662
 date: 2020-09-24 15:00:00
 ---
 
-## v2ay Cloudflare CDN 加速访问 科学
+## v2ray Cloudflare CDN 加速访问 科学
 
 本质原理是将v2ray伪装成web服务，然后利用CDN进行流量转发，从而隐藏真实VPS地址。
 
@@ -79,22 +79,22 @@ date: 2020-09-24 15:00:00
 
 	# 升级内核安装
 	wget "https://github.com/cx9208/bbrplus/raw/master/ok_bbrplus_centos.sh" && chmod +x ok_bbrplus_centos.sh && ./ok_bbrplus_centos.sh
-
+	
 	# 使用该脚本切换到bbr_plus以及配置优化
 	wget -N --no-check-certificate "https://raw.githubusercontent.com/chiakge/Linux-NetSpeed/master/tcp.sh" && ./tcp.sh
-
+	
 	# 查看状态
 	lsmod | grep bbr
-
+	
 	# 查看当前已经使用的TCP拥塞控制配置
 	cat /proc/sys/net/ipv4/tcp_congestion_control
-
+	
 	# 查看当前配置
 	cat /etc/sysctl.conf
 	
 	#如果没开启,则使用下面命令
 	sudo modprobe tcp_bbrplus
- 
+
 以上来自[网络教程](https://mrdear.cn/posts/tools-v2ray-cloudflare.html) centos7 安装
 
 ### 关闭防火墙
@@ -107,7 +107,7 @@ date: 2020-09-24 15:00:00
 	
 	# 关闭防火墙开机启动
 	systemctl disable firewalld.service
-	
+
 ### 设置Cloudflare开启CDN
 
 在Cloudflare 后台 dns设置 灰色的小云点击一下 设置为已代理
@@ -115,4 +115,4 @@ date: 2020-09-24 15:00:00
 
 ### 偷偷使用吧
 
-	
+​	
