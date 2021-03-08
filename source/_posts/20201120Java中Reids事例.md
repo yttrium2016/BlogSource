@@ -329,3 +329,166 @@ filter.contains(xx); //true | false
 ```
 
 > [布隆过滤器原理](https://www.cnblogs.com/cpselvis/p/6265825.html)
+
+### SpringBoot整合Reids做Session共享
+
+集群环境中,在session保存登录人的信息的时候,如果2次请求在2台服务器上,拿不到前一次的登录信息,所以引入Redis做全局的统一的session保存登录信息
+
+#### 创建一个基础的SpringBoot项目
+
+##### pom.xml
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>2.4.3</version>
+        <relativePath/> <!-- lookup parent from repository -->
+    </parent>
+    <groupId>cn.com.yangzhenyu</groupId>
+    <artifactId>redis-session</artifactId>
+    <version>1.0.0</version>
+    <name>redis-session</name>
+    <description>Redis Session project for Spring Boot</description>
+    <properties>
+        <java.version>1.8</java.version>
+    </properties>
+    <dependencies>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-redis</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.session</groupId>
+            <artifactId>spring-session-data-redis</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>cn.hutool</groupId>
+            <artifactId>hutool-all</artifactId>
+            <version>5.5.8</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+            </plugin>
+        </plugins>
+    </build>
+
+</project>
+```
+
+##### RedisController.java
+
+```java
+@RestController
+public class RedisController {
+
+    @Value("${server.port}")
+    private String port;
+
+    @Autowired
+    private HttpSession httpSession;
+
+    // 设置Session
+    @RequestMapping("set")
+    public String setSession(@RequestParam(required = false) String key, String value) {
+        HostInfo hostInfo = SystemUtil.getHostInfo();
+        if (StrUtil.isBlank(key)) {
+            key = "key";
+        }
+        httpSession.setAttribute(key, value);
+        return port + ":" + "ok";
+    }
+
+    // 读取Session
+    @RequestMapping("get")
+    public String getSession(String key) {
+        HostInfo hostInfo = SystemUtil.getHostInfo();
+        if (StrUtil.isBlank(key)) {
+            key = "key";
+        }
+        return port + ":" + httpSession.getAttribute(key);
+    }
+}
+```
+
+##### application.properties
+
+```properties
+spring.redis.host=127.0.0.1
+spring.redis.port=6379
+```
+
+##### RedisSessionConfig.java
+
+```java
+@Configuration
+// 开启RedisHttpSession
+@EnableRedisHttpSession
+public class RedisSessionConfig {
+}
+```
+
+> 已经完成了多个服务器共享Redis Session了
+
+#### 测试
+
+##### 启动
+
+![image-20210305145133565](http://img.yzy.ink/image-20210305145133565.png)
+
+> 启动2个不同端口的项目
+
+使用nginx简单的负载均衡
+
+```
+upstream appserver {
+    server 127.0.0.1:8081;
+    server 127.0.0.1:8082;
+}
+server {
+    listen 9000;
+    location / {
+    	proxy_pass http://appserver;
+    }
+}
+```
+
+> 注意:[appserver] 不能有[_]下划线 不然TOMCAT高版本会报错
+
+![image-20210305145446021](http://img.yzy.ink/image-20210305145446021.png)
+
+##### 请求
+
+###### 设置值
+
+![image-20210305145553658](http://img.yzy.ink/image-20210305145553658.png)
+
+###### 测试请求
+
+![image-20210305145633190](http://img.yzy.ink/image-20210305145633190.png)
+
+![image-20210305145652905](http://img.yzy.ink/image-20210305145652905.png)
+
+> 2台机器访问都能拿到统一的数据
